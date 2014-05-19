@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+</head>
+<body>
+    <style>
+    div {
+        margin: 10px;
+    }
+    
+    h1 {
+        font-family: Georgia;
+        font-weight: normal;
+        margin: 0px;
+        margin-bottom: 10px;
+    }
+    
+    form {
+        font-family: Georgia;
+    }
+    
+    #sidebar {
+        position: absolute;
+        display: inline;
+        width: 250px;
+        height: 94%;
+        border-right: 1px solid
+    }
+    
+    #d3 {
+        display: inline;
+        position: absolute;
+        width: 900px;
+        height 600px;
+        left: 250px;
+        margin-left: 20px;
+    }
+    
+    </style>
+    <div id="sidebar" background-color="red">
+        <h1>Clustering </h1>
+        <form onsubmit="refresh(); return false;">
+            n = <input type="text" name="n" id="n" value="1000"><br>
+            k = <input type="text" name="k" id="k" value="3"><br> <br>
+            <input type="button" value="Random Data" onclick="refresh();">
+        </form>
+    </div>
+    
+    <div id="d3" marginleft="200px"></div>
+    <script type="application/javascript">
+    var data = [];
+        
+    var width = 800, height = 600;
+    
+    var scaleX = d3.scale.linear().domain([0, 1]).range([0, width]),
+        scaleY = d3.scale.linear().domain([0, 1]).range([0, height]),
+        scaleColor = d3.scale.linear().domain([0, 50, 100])
+                                        .range(["green", "yellow", "red"]);
+                                        
+                                        
+     var clusteredPoints = function(n, k) {
+        n = n || 1000;
+        k = k || 2 + Math.random()*10;
+        
+        //Generates the center of the clusters
+        var clusters = [];
+        for(var i = 0; i < k; i++) {
+            clusters[i] = {
+                "x" : scaleX(Math.random()),
+                "y" : scaleY(Math.random()),
+                "rx" : width/10 + Math.random()*width/2, //radius x
+                "ry" : height/10 + Math.random()*height/2, //radius y
+            }
+        }
+        
+        // returns an roughly normally distributed random number between a and b
+        // with mean equal to the average of a and b.
+        var rand = function(a, b) { 
+            return a + (Math.random() + Math.random() + Math.random())*(b - a)/3;
+        }
+        
+        var d = [];
+        for(var i = 0; i < n; i++) {
+            var center = clusters[Math.floor(Math.random() * k)];
+            
+            d[i] = {
+                "x" : rand(Math.max(0, center.x - center.rx), 
+                           Math.min(width, center.x + center.rx)),
+                "y" : rand(Math.max(0, center.y - center.ry), 
+                           Math.min(height, center.y + center.ry)) 
+            }
+        }
+        return d;
+    }
+    
+    var refresh = function() {
+        console.log("refreshing");
+        svg.selectAll("circle")
+            .data([]).exit().remove();
+            
+        n = document.getElementById("n").value;
+        k = document.getElementById("k").value;
+        data = clusteredPoints(n, k);
+        svg.selectAll("circle")
+            .data(data).enter().append("circle")
+                    .attr("r", 2)
+                    .attr("cx", function(d){ return d.x; })
+                    .attr("cy", function(d){ return d.y; })
+                    .style("fill", "black");
+        //svg.selectAll(".point")
+        //    .data(data).exit().remove();
+        
+    }
+    data = clusteredPoints();
+    
+    var svg = d3.select("#d3")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);           
+    refresh();
+    </script>
+
+</body>
+
+
+</html>
