@@ -23,8 +23,8 @@ var randomCentroids = function() {
     centroids = [];
     for(var i = 0; i < k; i++) {
         centroids[i] = {
-            "x" : i,
-            "y" : i,
+            "x" : Math.random()*width,
+            "y" : Math.random()*height,
             "size" : 0
         }
         console.log("RC: " + centroids[i]);
@@ -32,7 +32,6 @@ var randomCentroids = function() {
             console.log(j);
         }
     }
-    step();
     return centroids;
 }
 
@@ -44,35 +43,30 @@ var randomCentroids = function() {
 
 var kMeans = function() {
     if(!centroids.length){
-        return randomCentroids();
-    }
-    
-    var newClusters = [];
-    for(var i = 0; i < centroids.length; i++) {
-        newClusters[i] = {
-            "x" : Math.random()*width,
-            "y" : Math.random()*height,
-            "size" : 0
+        centroids = randomCentroids();
+    } else {
+        for(var i in centroids){
+            centroids[i].x = 0;
+            centroids[i].y = 0;
+            centroids[i].size = 0;
+        }
+        for(var i in data) {
+            centroids[data[i].cluster].x += data[i].x;
+            centroids[data[i].cluster].y += data[i].y;
+            centroids[data[i].cluster].size++;
+        }
+         for(var i in centroids){
+            centroids[i].x /= centroids[i].size;
+            centroids[i].y /= centroids[i].size;
         }
     }
+
     for(var i in data) {
         data[i].cluster = nearestCentroid(data[i], centroids);
-        newClusters[data[i].cluster].x += data[i].x;
-        newClusters[data[i].cluster].y += data[i].y;
-        newClusters[data[i].cluster].size++;
     }
     
-    for(var i in newClusters) {
-        if(newClusters[i].size != 0) {
-            newClusters[i].x /= newClusters[i].size;
-            newClusters[i].y /= newClusters[i].size;
-        }
-        centroids[i] = newClusters[i];
-        console.log(newClusters[i]);
-        console.log("C: " + centroids[i].x);
-    }
     step();
-    return newClusters;
+    return centroids;
 }
 
 var step = function() {
