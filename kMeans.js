@@ -35,12 +35,6 @@ var randomCentroids = function() {
     return centroids;
 }
 
-//var p = function(o) {
-//    for(var v in o) [
-//       // conole.log(v + ":" + o[v]);
-//    }
-//}
-
 var kMeans = function() {
     if(!centroids.length){
         centroids = randomCentroids();
@@ -56,8 +50,13 @@ var kMeans = function() {
             centroids[data[i].cluster].size++;
         }
          for(var i in centroids){
-            centroids[i].x /= centroids[i].size;
-            centroids[i].y /= centroids[i].size;
+            if(centroids[i].size !== 0) {
+                centroids[i].x /= centroids[i].size;
+                centroids[i].y /= centroids[i].size;
+            } else {
+                centroids[i].x = Math.random()*width;
+                centroids[i].y = Math.random()*height;
+            }
         }
     }
 
@@ -69,27 +68,36 @@ var kMeans = function() {
     return centroids;
 }
 
+var redrawLines = function() {
+    svg.selectAll(".line").remove();
+    svg.selectAll(".line").data(data)
+                .enter().append("line")
+                .attr("x1", function(d){ return d.x; })
+                .attr("y1", function(d){ return d.y; })
+                .attr("x2", function(d){ return centroids[d.cluster].x; })
+                .attr("y2", function(d){ return centroids[d.cluster].y; })
+                .style("stroke", color)
+                .style("stroke-width", 0.5)
+                .style("opacity", 0.3)
+                .attr("stroke-dasharray", "5, 5")
+                .attr("class", "line");
+}
+
 var step = function() {
-    console.log("stepping");
-    console.log("refreshing");
-    svg.selectAll(".point")
-        .data([]).exit().remove();
+    svg.selectAll(".point").remove();
+    redrawLines();
+    redrawData();
     
-    svg.selectAll("circle")
-        .data(data).enter().append("circle")
-                .attr("r", 2)
-                .attr("cx", function(d){ return d.x; })
-                .attr("cy", function(d){ return d.y; })
-                .style("fill", color)
-                .attr("class", "point");
-    //srefresh();
-    //centroids = kMeans();
+    var size = 4;
     svg.selectAll(".centroid").data([]).exit().remove();
     svg.selectAll("centroid")
-        .data(centroids).enter().append("circle")
-                .attr("r", 5)
-                .attr("cx", function(d){ return d.x; })
-                .attr("cy", function(d){ return d.y; })
+        .data(centroids).enter().append("polygon")
+                .attr("points", function(d) {
+                        return (d.x - size) + "," + d.y + " " +
+                               d.x + "," + (d.y - size) + " " +
+                               (d.x + size) + "," + d.y + " " +
+                               d.x + "," + (d.y + size);
+                    })
                 .style("fill", function(d, i){ return color(d, i); })
                 .attr("class", "centroid");
 }

@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <head>
     <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="Initialization.js"></script>
+    <script src="Main.js"></script>
     <script src="kMeans.js"></script>
 </head>
 <body>
@@ -51,7 +51,11 @@
         </form>
         <br><br>
         <h2>k-Means</h2>
-        <input type="button" value="Step" onclick="kMeans();">
+        <input type="checkbox">Show Lines</input><br>
+        <input type="checkbox">Show Voronoi Diagram</input><br>
+        <input type="checkbox">Show Convex Hull</input><br>
+        <input type="checkbox">Show Centroids</input><br>
+        <input type="button" value="Step" onclick="kMeans();"/>
     </div>
     
     <div id="d3" marginleft="200px"></div>
