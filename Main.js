@@ -46,25 +46,26 @@ var clusteredPoints = function(n) {
     return d;
 }
 
-var color = function(d, property) {
-    property = "cluster";
-    
-    if(d.cluster === -1) {
+var color = function(cluster) {
+    if(cluster === -1) {
         return "black";
     }
     var phi = 0.61803398875; //Golden ratio minus one
-    var c = d.cluster;
-    var h = 360*(c * phi - Math.floor(c*phi));
+    var h = 360*(cluster * phi - Math.floor(cluster * phi));
     return "hsl(" + h + ", 100%, 35%)";
 }
 
 var redrawData = function() {
+    if(data.length !== 0) {
+        svg.selectAll(".point").transition().attr
+    }
+
     var points = svg.selectAll(".point").data(data, function(d){ return d.x; });
     points.enter().append("circle")
                 .attr("r", 3)
                 .attr("cx", function(d){ return d.x; })
                 .attr("cy", function(d){ return d.y; })
-                .style("fill", color)
+                .style("fill", function(d){ return color(d.cluster); })
                 .style("stroke", "black")
                 .style("opacity", 0.8)
                 .attr("class", "point");
@@ -80,9 +81,11 @@ var generateData = function() {
 }
 
 var resetAlgos = function() {
-    centroids = [];
+    clusters = [];
     svg.selectAll(".centroid").remove();
     svg.selectAll(".line").remove();
+    svg.selectAll(".hull").remove();
+    document.getElementById("hullBox").checked = false;
 }
 
 var refresh = function() {

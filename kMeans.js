@@ -1,4 +1,4 @@
-var centroids = [];
+var clusters = [];
 
 //Returns the euclidean distance / 2-norm between two points p and q
 var dist = function(p, q) {
@@ -7,9 +7,9 @@ var dist = function(p, q) {
 
 var nearestCentroid = function(point, centroids) {
     nearest = 0;
-    min = dist(point, centroids[0]);
-    for(var i = 1; i < centroids.length; i++) {
-        d = dist(point, centroids[i]);
+    min = dist(point, clusters[0]);
+    for(var i = 1; i < clusters.length; i++) {
+        d = dist(point, clusters[i]);
         if(d < min) {
             nearest = i;
             min = d;
@@ -27,45 +27,41 @@ var randomCentroids = function() {
             "y" : Math.random()*height,
             "size" : 0
         }
-        console.log("RC: " + centroids[i]);
-        for(var j in centroids[i]){
-            console.log(j);
-        }
     }
     return centroids;
 }
 
 var kMeans = function() {
-    if(!centroids.length){
-        centroids = randomCentroids();
+    if(!clusters.length){
+        clusters = randomCentroids();
     } else {
-        for(var i in centroids){
-            centroids[i].x = 0;
-            centroids[i].y = 0;
-            centroids[i].size = 0;
+        for(var i = 0; i < clusters.length; i++){
+            clusters[i].x = 0;
+            clusters[i].y = 0;
+            clusters[i].size = 0;
         }
         for(var i in data) {
-            centroids[data[i].cluster].x += data[i].x;
-            centroids[data[i].cluster].y += data[i].y;
-            centroids[data[i].cluster].size++;
+            clusters[data[i].cluster].x += data[i].x;
+            clusters[data[i].cluster].y += data[i].y;
+            clusters[data[i].cluster].size++;
         }
-         for(var i in centroids){
-            if(centroids[i].size !== 0) {
-                centroids[i].x /= centroids[i].size;
-                centroids[i].y /= centroids[i].size;
+         for(var i in clusters){
+            if(clusters[i].size !== 0) {
+                clusters[i].x /= clusters[i].size;
+                clusters[i].y /= clusters[i].size;
             } else {
-                centroids[i].x = Math.random()*width;
-                centroids[i].y = Math.random()*height;
+                clusters[i].x = Math.random()*width;
+                clusters[i].y = Math.random()*height;
             }
         }
     }
 
     for(var i in data) {
-        data[i].cluster = nearestCentroid(data[i], centroids);
+        data[i].cluster = nearestCentroid(data[i], clusters);
     }
     
     step();
-    return centroids;
+    return clusters;
 }
 
 var redrawLines = function() {
@@ -74,11 +70,11 @@ var redrawLines = function() {
                 .enter().append("line")
                 .attr("x1", function(d){ return d.x; })
                 .attr("y1", function(d){ return d.y; })
-                .attr("x2", function(d){ return centroids[d.cluster].x; })
-                .attr("y2", function(d){ return centroids[d.cluster].y; })
+                .attr("x2", function(d){ return clusters[d.cluster].x; })
+                .attr("y2", function(d){ return clusters[d.cluster].y; })
                 .style("stroke", color)
                 .style("stroke-width", 0.5)
-                .style("opacity", 0.3)
+                .style("opacity", 0.4)
                 .attr("stroke-dasharray", "5, 5")
                 .attr("class", "line");
 }
@@ -88,16 +84,21 @@ var step = function() {
     redrawLines();
     redrawData();
     
-    var size = 4;
+    var size = 6;
     svg.selectAll(".centroid").data([]).exit().remove();
     svg.selectAll("centroid")
-        .data(centroids).enter().append("polygon")
+        .data(clusters).enter().append("polygon")
                 .attr("points", function(d) {
+                        console.log(">_<");
                         return (d.x - size) + "," + d.y + " " +
                                d.x + "," + (d.y - size) + " " +
                                (d.x + size) + "," + d.y + " " +
                                d.x + "," + (d.y + size);
                     })
-                .style("fill", function(d, i){ return color(d, i); })
+                .style("fill", "black")
+                .style("opacity", 1)
+                .style("stroke", "white")
+                .style("stroke-width", 2)
+                //.style("stroke-opacity", 0.5)
                 .attr("class", "centroid");
 }

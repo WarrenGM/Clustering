@@ -5,6 +5,7 @@
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="Main.js"></script>
     <script src="kMeans.js"></script>
+    <script src="Hull.js"></script>
 </head>
 <body>
     <style>
@@ -45,7 +46,7 @@
     <div id="sidebar" background-color="red">
         <h1>Clustering </h1>
         <form onsubmit="refresh(); return false;">
-            n = <input type="text" name="n" id="n" value="20"><br>
+            n = <input type="text" name="n" id="n" value="1000"><br>
             k = <input type="text" name="k" id="k" value="3"><br> <br>
             <input type="button" value="Random Data" onclick="refresh();">
         </form>
@@ -53,20 +54,19 @@
         <h2>k-Means</h2>
         <input type="checkbox">Show Lines</input><br>
         <input type="checkbox">Show Voronoi Diagram</input><br>
-        <input type="checkbox">Show Convex Hull</input><br>
-        <input type="checkbox">Show Centroids</input><br>
+        <input type="checkbox" id="hullBox" onclick="displayHull()">Show Convex Hull</input><br>
         <input type="button" value="Step" onclick="kMeans();"/>
     </div>
     
     <div id="d3" marginleft="200px"></div>
     <script type="application/javascript">
-    
-      
-    
+ 
     var svg = d3.select("#d3")
                 .append("svg")
                 .attr("width", width)
-                .attr("height", height);           
+                .attr("height", height);   
+    
+    refresh();
     </script>
 
 </body>
